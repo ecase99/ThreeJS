@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>lights</title>
+	</head>
+	<body>
+    
+  
+
+  <script type="module">
+    import * as THREE from './js/build/three.module.js'
+    import { OrbitControls } from './js/examples/jsm/controls/OrbitControls.js'
+
+
+    let wireframe = false;
+    var axis = new THREE.Vector3(0.5,0.5,0);
+    let rad = .01;
+    let radIncrement = .1;
+    rad += radIncrement;
+
+    //first create a "world" or "scene" to hold the data you will render to the screen (where the data is 3D geometry)      
+    const scene = new THREE.Scene();
+
+    //define a camera to look into the 3D world
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+
+    //we are going to place our 3D meshes at the center of the world's coordinate system, 
+    //  so we move the camera so that it can see them 
+    camera.position.z = 5;
+
+    //tell Three.js to render our geometry using the GPU
+    const renderer = new THREE.WebGLRenderer();
+
+    //make the canvas take up the entire browser window
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    //once the renderer and camera are created, 
+    // we can define how the camera can be moved
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+
+    //a 3D object consists of:
+    // some POINTS (called "geometry") that define the object
+    // a MATERIAL that defines how the faces of the geometry are rendered
+    const geometry1 = new THREE.BoxGeometry();
+    const material1 = new THREE.MeshPhongMaterial();
+
+    //you put these together by making a MESH
+    const cube = new THREE.Mesh(geometry1, material1);
+
+
+
+    //we can also make some other kinds of 3D objects:
+
+    //sphere
+    const geometry2 = new THREE.SphereGeometry(0.4, 5, 6); //radius, resX, resY
+    const material2 = new THREE.MeshPhongMaterial();
+    const sphere = new THREE.Mesh(geometry2, material2);
+    sphere.position.x = 2; //move it to the right
+    sphere.position.y = 1;
+    scene.add(sphere);
+
+    //dodecahedron
+    const geometry5 = new THREE.DodecahedronGeometry(1.5);
+    const material5 = new THREE.MeshPhongMaterial();
+    const dodecahedron = new THREE.Mesh(geometry5, material5);
+    dodecahedron.position.x = 4; //move it down
+    scene.add(dodecahedron);
+
+
+    //setting the mesh material to "wireframe = true" can make it easier to see the faces of the geometry 
+    if (wireframe) {
+      material1.wireframe = true;
+      material2.wireframe = true;
+      material3.wireframe = true;
+      material4.wireframe = true;
+      material5.wireframe = true;
+    }
+
+    
+    const light1 = new THREE.PointLight( 0xff8000 );
+    light1.position.set( 10, 60, 50 );
+    scene.add( light1 );
+
+    const light2 = new THREE.PointLight( 0x00ff80 );
+    light2.position.set( 50, 40, -10 );
+    //scene.add( light2 );
+
+    const light3 = new THREE.PointLight( 0xff0000 );
+    light3.position.set( -50, 0, 0 );
+    //scene.add( light3 );
+
+    const white_pointlight = new THREE.PointLight( 0xffffff );
+    white_pointlight.position.set( 20, 50, 0 );
+    //scene.add( white_pointlight );
+
+    const ambientLight = new THREE.AmbientLight( 0x202020 ); // soft white light
+    //scene.add( ambientLight );
+
+
+    let light_dx = 0.1;
+
+    const animate = function () {
+      requestAnimationFrame(animate);
+
+      controls.update();
+
+      rotateObject(dodecahedron, -0.001, 0.02);
+      rotateObject(sphere , 0.001, .025);
+
+      sphere.rotateOnAxis(axis, rad);
+
+      white_pointlight.position.x += light_dx;
+
+      if (white_pointlight.position.x > 10) {
+        light_dx = -0.1;
+      } else if (white_pointlight.position.x < -10) {
+        light_dx = 0.1; 
+      }
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    function rotateObject(o, dx, dy) {
+      o.rotation.x += dx;
+      o.rotation.y += dy;
+    }
+
+  </script>
+  </body>
+  
+  </html>
